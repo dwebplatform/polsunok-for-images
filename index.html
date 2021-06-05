@@ -1,0 +1,111 @@
+<style>
+  .my-image-scroller {
+    position: relative;
+    overflow: hidden;
+    width: 600px;
+    height: 600px;
+    transition: .1s;
+  }
+
+
+  .image-wrapper {
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    overflow: hidden;
+  }
+
+  img {
+    display: block;
+    min-width: 100%;
+    cursor: pointer;
+  }
+
+
+  .slider {
+    border: 1px solid green;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden;
+    transition: 0.3s;
+
+  }
+
+  .dragme {
+    width: 30px;
+    height: 30px;
+    border: 1px solid skyblue;
+    position: absolute;
+    background: skyblue;
+    z-index: 300;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .transitioned {
+    transition: 0.3s;
+  }
+
+  .image-wrapper__after {
+    top: 0;
+    left: 0;
+    width: 50%;
+  }
+</style>
+<div class="container">
+  <div class="my-image-scroller">
+    <div class="image-wrapper image-wrapper__before ">
+      <img width="600px" height="600px" src="https://cdn.pixabay.com/photo/2019/06/27/12/45/cat-4302240_1280.jpg" />
+    </div>
+    <div class="image-wrapper image-wrapper__after js-image-after ">
+      <img width="600px" height="600px" src="https://images.alphacoders.com/475/thumbbig-475895.webp" />
+    </div>
+    <div class="dragme" />
+  </div>
+</div>
+
+<div class="container">
+  <div class="my-image-scroller" data-slider-id="1">
+    <div class="image-wrapper image-wrapper__before ">
+      <img width="600px" height="600px" src="https://cdn.pixabay.com/photo/2019/06/27/12/45/cat-4302240_1280.jpg" />
+    </div>
+    <div class="image-wrapper image-wrapper__after js-image-after ">
+      <img width="600px" height="600px" src="https://images.alphacoders.com/475/thumbbig-475895.webp" />
+    </div>
+    <div class="dragme" />
+  </div>
+</div>
+
+<script>
+  const controllSliders = () => {
+    const slider = (el) => {
+      const $imageContainer = el;
+      const $leftImage = $imageContainer.querySelector('.js-image-after');
+      const $dragMe = $imageContainer.querySelector('.dragme');
+      $imageContainer.addEventListener('mousemove', (ev) => {
+        $leftImage.classList.remove('transitioned');
+        $dragMe.classList.remove('transitioned');
+        let x = ev.offsetX;
+        $leftImage.style.width = x + 'px';
+        $dragMe.style.left = x + 'px';
+      });
+      $imageContainer.addEventListener('mouseleave', (ev) => {
+        $leftImage.style.width = '50%';
+        $dragMe.style.left = '50%';
+        $leftImage.classList.add('transitioned');
+        $dragMe.classList.add('transitioned');
+      });
+    }
+    const allSliders = [...document.querySelectorAll('.my-image-scroller')];
+    allSliders.forEach(($sliderEl) => {
+      slider($sliderEl);
+    });
+  }
+  controllSliders();
+
+</script>
