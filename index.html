@@ -15,7 +15,7 @@
     overflow: hidden;
   }
 
-  img {
+  .image-wrapper img {
     display: block;
     min-width: 100%;
     cursor: pointer;
@@ -58,6 +58,7 @@
   }
 </style>
 <div class="container">
+
   <div class="my-image-scroller">
     <div class="image-wrapper image-wrapper__before ">
       <img width="600px" height="600px" src="https://cdn.pixabay.com/photo/2019/06/27/12/45/cat-4302240_1280.jpg" />
@@ -83,28 +84,72 @@
 
 <script>
   const controllSliders = () => {
-    const slider = (el) => {
-      const $imageContainer = el;
+    function getPosition(ev) {
+      let x, y;
+      if (ev.type.includes('mouse')) {
+        x = ev.offsetX;
+        y = ev.offsetY;
+
+      } else {
+        let bcr = ev.target.getBoundingClientRect();
+
+        x = ev.targetTouches[0].clientX - bcr.x;
+        y = ev.targetTouches[0].clientY - bcr.y;
+      }
+      //      x = ev.targetTouches[0].clientX - bcr.x;
+      //    y = ev.targetTouches[0].clientY - bcr.y;
+      return { x };
+    }
+    function setBack($leftImage, $dragMe) {
+      $leftImage.classList.remove('transitioned');
+      $dragMe.classList.remove('transitioned');
+    }
+    function cancelMove($leftImage, $dragMe) {
+      $leftImage.style.width = '50%';
+      $dragMe.style.left = '50%';
+      $leftImage.classList.add('transitioned');
+      $dragMe.classList.add('transitioned');
+    }
+    const slider = ($imageContainer) => {
       const $leftImage = $imageContainer.querySelector('.js-image-after');
       const $dragMe = $imageContainer.querySelector('.dragme');
-      $imageContainer.addEventListener('mousemove', (ev) => {
-        $leftImage.classList.remove('transitioned');
-        $dragMe.classList.remove('transitioned');
-        let x = ev.offsetX;
+      //!TODO: добавить событие клик, чтобы можно было на телефоне крутить вертеть
+
+      $imageContainer.addEventListener('touchstart', (ev) => {
+        setBack($leftImage, $dragMe);
+      });
+
+      $imageContainer.addEventListener('touchend', (ev) => {
+        cancelMove($leftImage, $dragMe);
+      });
+      const updatePosition = ($leftImage, $dragMe, x) => {
         $leftImage.style.width = x + 'px';
         $dragMe.style.left = x + 'px';
-      });
-      $imageContainer.addEventListener('mouseleave', (ev) => {
+      }
+      function mouseMove(ev) {
+        setBack($leftImage, $dragMe);
+        let { x } = getPosition(ev);
+        updatePosition($leftImage, $dragMe, x);
+      }
+      function mouseLeave(ev) {
         $leftImage.style.width = '50%';
         $dragMe.style.left = '50%';
         $leftImage.classList.add('transitioned');
         $dragMe.classList.add('transitioned');
+      }
+      $imageContainer.addEventListener('touchmove', (ev) => {
+        let { x } = getPosition(ev);
+        updatePosition($leftImage, $dragMe, x);
+      });
+      $imageContainer.addEventListener('mousemove', (ev) => {
+        mouseMove(ev);
+      });
+      $imageContainer.addEventListener('mouseleave', (ev) => {
+        mouseLeave(ev)
       });
     }
     const allSliders = [...document.querySelectorAll('.my-image-scroller')];
-    allSliders.forEach(($sliderEl) => {
-      slider($sliderEl);
-    });
+    allSliders.forEach(slider);
   }
   controllSliders();
 
